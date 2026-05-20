@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { siteConfig } from "@/lib/site";
+import RevealEmail from "@/components/layout/RevealEmail";
 
 export const metadata: Metadata = {
   title: "문의",
@@ -19,7 +20,7 @@ export default function ContactPage() {
         </p>
         <p>
           <strong>이메일:</strong>{" "}
-          <a href={`mailto:${siteConfig.contactEmail}`}>{siteConfig.contactEmail}</a>
+          <RevealEmail email={siteConfig.contactEmail} />
         </p>
         <p>
           게시글의 실거래가, 표, 설명, 링크 중 오류가 있다고 판단되실 경우 해당 내용을 검토한 뒤

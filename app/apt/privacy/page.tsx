@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { siteConfig } from "@/lib/site";
+import RevealEmail from "@/components/layout/RevealEmail";
 
 export const metadata: Metadata = {
   title: "개인정보처리방침",
@@ -91,9 +92,9 @@ export default function PrivacyPage() {
         <h2>8. 문의</h2>
         <p>
           개인정보 처리와 관련한 문의는{" "}
-          <a href="/apt/contact">문의 페이지</a> 또는 이메일{" "}
-          <a href={`mailto:${siteConfig.contactEmail}`}>{siteConfig.contactEmail}</a>
-          로 연락해 주세요.
+          <a href="/apt/contact">문의 페이지</a> 또는{" "}
+          <RevealEmail email={siteConfig.contactEmail} />
+          {" "}으로 연락해 주세요.
         </p>
       </div>
     </div>

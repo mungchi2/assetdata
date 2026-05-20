@@ -34,64 +34,34 @@ export default function RootPage() {
 
       {/* 섹션 카드 */}
       <section style={{ maxWidth: "960px", margin: "0 auto", padding: "0 20px 80px" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "20px" }}>
-
-          {/* 부동산 */}
-          <Link
-            href="/apt"
-            style={{
-              display: "block",
-              padding: "32px",
-              border: "1px solid #e5e7eb",
-              borderRadius: "16px",
-              textDecoration: "none",
-              color: "inherit",
-              transition: "border-color 0.15s, box-shadow 0.15s",
-            }}
-            className="card"
-          >
-            <div style={{ fontSize: "28px", marginBottom: "14px" }}>🏢</div>
-            <h2 style={{ fontSize: "20px", fontWeight: 700, color: "#111", marginBottom: "8px" }}>
-              집보는 시선
-            </h2>
-            <p style={{ fontSize: "14px", color: "#888", marginBottom: "4px", fontWeight: 500 }}>
-              부동산 분석
-            </p>
-            <p style={{ fontSize: "15px", color: "#555", lineHeight: 1.65, margin: "12px 0 0" }}>
-              실거래가·건축물대장·입지 데이터를 함께 보고 아파트 가격 차이의 이유를 설명합니다.
-            </p>
-            <p style={{ marginTop: "20px", fontSize: "14px", color: "#1558d6", fontWeight: 600 }}>
-              바로가기 →
-            </p>
-          </Link>
-
-          {/* 주식 (준비중) */}
-          <div
-            style={{
-              display: "block",
-              padding: "32px",
-              border: "1px dashed #d1d5db",
-              borderRadius: "16px",
-              background: "#fafafa",
-              opacity: 0.75,
-            }}
-          >
-            <div style={{ fontSize: "28px", marginBottom: "14px" }}>📈</div>
-            <h2 style={{ fontSize: "20px", fontWeight: 700, color: "#111", marginBottom: "8px" }}>
-              주식보는 시선
-            </h2>
-            <p style={{ fontSize: "14px", color: "#888", marginBottom: "4px", fontWeight: 500 }}>
-              주식 분석 · 준비중
-            </p>
-            <p style={{ fontSize: "15px", color: "#555", lineHeight: 1.65, margin: "12px 0 0" }}>
-              실적, 밸류에이션, 수급 데이터를 함께 보는 주식 분석 콘텐츠를 준비하고 있습니다.
-            </p>
-            <p style={{ marginTop: "20px", fontSize: "14px", color: "#aaa", fontWeight: 600 }}>
-              Coming soon
-            </p>
-          </div>
-
-        </div>
+        <Link
+          href="/apt"
+          style={{
+            display: "block",
+            maxWidth: "480px",
+            padding: "32px",
+            border: "1px solid #e5e7eb",
+            borderRadius: "16px",
+            textDecoration: "none",
+            color: "inherit",
+            transition: "border-color 0.15s, box-shadow 0.15s",
+          }}
+          className="card"
+        >
+          <div style={{ fontSize: "28px", marginBottom: "14px" }}>🏢</div>
+          <h2 style={{ fontSize: "20px", fontWeight: 700, color: "#111", marginBottom: "8px" }}>
+            집보는 시선
+          </h2>
+          <p style={{ fontSize: "14px", color: "#888", marginBottom: "4px", fontWeight: 500 }}>
+            부동산 분석
+          </p>
+          <p style={{ fontSize: "15px", color: "#555", lineHeight: 1.65, margin: "12px 0 0" }}>
+            실거래가·건축물대장·입지 데이터를 함께 보고 아파트 가격 차이의 이유를 설명합니다.
+          </p>
+          <p style={{ marginTop: "20px", fontSize: "14px", color: "#1558d6", fontWeight: 600 }}>
+            바로가기 →
+          </p>
+        </Link>
       </section>
 
       {/* 푸터 */}
