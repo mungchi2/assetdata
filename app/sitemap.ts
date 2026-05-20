@@ -14,7 +14,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${apt}/contact`,      lastModified: new Date(), changeFrequency: "monthly", priority: 0.5 },
     { url: `${apt}/privacy`,      lastModified: new Date(), changeFrequency: "monthly", priority: 0.4 },
     { url: `${apt}/sources`,      lastModified: new Date(), changeFrequency: "monthly", priority: 0.4 },
-    { url: `${root}/stock`,       lastModified: new Date(), changeFrequency: "monthly", priority: 0.3 },
   ];
 
   const categoryPages: MetadataRoute.Sitemap = categories.map((cat) => ({

@@ -1,0 +1,937 @@
+{
+  "version": "2026-05-17",
+  "title": "자동화 플로우 코드맵",
+  "description": "/workspace/scripts/news 와 /workspace/scripts/bunyang 아래 자동화 코드를 큰 파이프라인, 단계별 생성물, 선택 가능한 글 타입/분기, 하위 코드 flow 관점으로 시각화한 운영 문서입니다.",
+  "lastReviewedAt": "2026-05-17",
+  "sourceOfTruthNote": "이 JSON은 코드 이해용 지도입니다. 실제 동작 원본은 scripts/* 엔트리포인트와 pipeline/* 구현 파일입니다.",
+  "howToRead": [
+    "pipelineOverview에서 전체 흐름을 먼저 봅니다.",
+    "codeFlow는 실제 스크립트가 어떤 함수와 pipeline 모듈로 내려가는지 보여줍니다.",
+    "branchOptions는 실행 중 선택 가능한 글 타입, 단계, 옵션, fallback을 모은 영역입니다.",
+    "stageArtifacts는 각 단계가 어떤 파일을 읽고 어떤 파일을 생성하는지 보여줍니다."
+  ],
+  "shared": {
+    "dateKey": {
+      "format": "YYYYMMDD",
+      "timezone": "Asia/Seoul",
+      "usedBy": [
+        "news_llm_{region}_{YYYYMMDD}.json",
+        "news_payload_{YYYYMMDD}_{index}_{safe_title}.json",
+        "bunyang_payload_{YYYYMMDD}_{safe_project_name}.json",
+        "bunyang_article_{YYYYMMDD}_{safe_title}.md"
+      ]
+    },
+    "configs": [
+      {
+        "name": "지역 설정",
+        "path": "/workspace/config/regions.yaml",
+        "usedBy": "일부 지역 기반 수집/후보군 로직"
+      },
+      {
+        "name": "룰 설정",
+        "path": "/workspace/config/rules.yaml",
+        "usedBy": "뉴스 실거래 signal 후보 탐지. 현재 코드의 신규 signal 룰은 코드 기본값 fallback을 많이 사용하므로 튜닝 전 동기화 필요"
+      }
+    ],
+    "dataDirectories": [
+      {
+        "label": "뉴스 LLM 분석",
+        "path": "/workspace/data/news/analysis"
+      },
+      {
+        "label": "뉴스 payload",
+        "path": "/workspace/data/news/payloads"
+      },
+      {
+        "label": "뉴스 article",
+        "path": "/workspace/data/news/articles"
+      },
+      {
+        "label": "분양 source/detail",
+        "path": "/workspace/data/bunyang/source_data"
+      },
+      {
+        "label": "분양 공고문 PDF",
+        "path": "/workspace/data/bunyang/notices/pdfs"
+      },
+      {
+        "label": "분양 공고문 text",
+        "path": "/workspace/data/bunyang/notices/texts"
+      },
+      {
+        "label": "분양 payload",
+        "path": "/workspace/data/bunyang/payloads"
+      },
+      {
+        "label": "분양 article",
+        "path": "/workspace/data/bunyang/articles"
+      }
+    ],
+    "marketDataRules": [
+      "최근 월 배열은 get_recent_months(count, include_current_month=true) 기준입니다.",
+      "뉴스는 event_date가 있으면 해당 이벤트 월을 조회 월 목록에 강제로 포함합니다.",
+      "분양 주변 실거래 비교는 기본 최근 12개월입니다.",
+      "지역 시세 요약에서는 deal_price_manwon 30000 미만을 제외하고, 면적 그룹별 median의 35% 미만도 이상치로 제외합니다.",
+      "가격 표시는 만원 단위를 억원 텍스트로 변환한 *_text 필드를 함께 만듭니다.",
+      "유효 면적 그룹은 ~40, 40~60, 60~85, 85~102, 102~135, 135+ 입니다."
+    ]
+  },
+  "flows": [
+    {
+      "id": "news",
+      "name": "뉴스 자동화",
+      "purpose": "지역 뉴스에서 아파트 가격 판단에 직접 연결되는 글감을 골라 실거래 데이터와 결합한 뉴스 해석글을 생성합니다.",
+      "pipelineOverview": [
+        {
+          "order": 1,
+          "name": "뉴스 목록 수집",
+          "script": "/workspace/scripts/news/analyze_sources.py",
+          "input": "--region, --max-items",
+          "output": "raw_news.news_list",
+          "visual": "네이버 지역 뉴스 목록 -> 기사 URL/제목/날짜 후보군"
+        },
+        {
+          "order": 2,
+          "name": "제목 필터링",
+          "script": "/workspace/scripts/news/analyze_sources.py",
+          "input": "news_list titles",
+          "output": "filtered_news",
+          "visual": "기사 제목들 -> relevant=true 기사만 통과"
+        },
+        {
+          "order": 3,
+          "name": "본문 LLM 분석",
+          "script": "/workspace/scripts/news/analyze_sources.py",
+          "input": "filtered_news body",
+          "output": "news_llm_{region}_{YYYYMMDD}.json",
+          "visual": "본문 -> event_type, analysis_lens, locations, area_groups, event_date"
+        },
+        {
+          "order": 4,
+          "name": "실거래 payload 생성",
+          "script": "/workspace/scripts/news/build_payload.py",
+          "input": "news_llm JSON",
+          "output": "news_payload_{date}_{index}_{title}.json",
+          "visual": "분석 JSON + MOLIT 실거래 -> writer용 market package"
+        },
+        {
+          "order": 5,
+          "name": "뉴스 글 작성",
+          "script": "/workspace/scripts/news/write_article.py",
+          "input": "news_payload JSON",
+          "output": "news_article_{date}_{title}.md",
+          "visual": "payload + prompt -> SEO markdown article"
+        }
+      ],
+      "codeFlow": [
+        {
+          "script": "/workspace/scripts/news/analyze_sources.py",
+          "calls": [
+            "NaverRegionNewsCollector.collect(region_name, max_items)",
+            "filter_news_by_titles(client, filter_model, news_list, max_output_tokens)",
+            "analyze_single_news(client, model, item, index, max_output_tokens, region_name)",
+            "save_output(region_name, raw_news, analyzed_items)"
+          ],
+          "pipelineModules": [
+            "/workspace/pipeline/news/collect_naver_news.py",
+            "/workspace/pipeline/prompts/news_title_filter_prompt.py",
+            "/workspace/pipeline/prompts/news_source_analysis_prompt.py",
+            "/workspace/pipeline/llm/openai_responses_client.py"
+          ],
+          "generated": [
+            "/workspace/data/news/analysis/news_llm_{region}_{YYYYMMDD}.json"
+          ]
+        },
+        {
+          "script": "/workspace/scripts/news/build_payload.py",
+          "calls": [
+            "run_build_source_news(news_analysis_path)",
+            "collect_news_data_package(llm_output, news_meta, client, rules_config, collection_region)",
+            "collect_region_transactions(...)",
+            "_extract_subject_apartments(...)",
+            "_extract_peer_apartments(...)",
+            "_build_area_stats(...)",
+            "_run_signal_detection(...)",
+            "_prepare_writer_signals(...)"
+          ],
+          "pipelineModules": [
+            "/workspace/pipeline/news/build_payload.py",
+            "/workspace/pipeline/news/collect_market_data.py",
+            "/workspace/pipeline/news/detect_topics.py",
+            "/workspace/pipeline/news/detect_trade_signals.py",
+            "/workspace/pipeline/shared/collect_transactions.py"
+          ],
+          "generated": [
+            "/workspace/data/news/payloads/news_payload_{YYYYMMDD}_{index:03d}_{safe_title}.json"
+          ]
+        },
+        {
+          "script": "/workspace/scripts/news/write_article.py",
+          "calls": [
+            "OpenAISettings.from_env()",
+            "write_article(package, client)",
+            "save_article(result, package, output_dir)"
+          ],
+          "pipelineModules": [
+            "/workspace/pipeline/news/write_article.py",
+            "/workspace/pipeline/prompts/news_article_writing_prompt.py"
+          ],
+          "generated": [
+            "/workspace/data/news/articles/news_article_{YYYYMMDD}_{safe_title}.md"
+          ]
+        }
+      ],
+      "branchOptions": {
+        "publishFilters": [
+          "title filter relevant=true",
+          "is_real_estate_relevant가 false면 skip",
+          "apartment_price_relevance가 direct가 아니면 skip",
+          "analysis_lens=기타는 현재 발행 보류",
+          "primary_locations.location_confidence=low는 실거래 조회 제외",
+          "collection_region과 sigungu 불일치 시 해당 위치 skip"
+        ],
+        "marketScopeFallbacks": [
+          "analysis_lens별 기본 scope/lookback 사용",
+          "llm_output.data_query_params.recommended_lookback_months가 있으면 기본 lookback override",
+          "event_date의 YYYY-MM이 조회 기간 밖이면 target_months에 추가",
+          "area_stats가 비고 peer_apartments가 있으면 peer 기준 reporting scope 생성",
+          "region_metas가 없거나 실거래가 없으면 empty package로 writer note 생성"
+        ],
+        "writerSignalPolicy": [
+          "raw signal은 최대 10개까지 만들 수 있지만 writer에는 선별 signal만 전달",
+          "공급충격은 signal 최대 2개",
+          "수혜단지비교는 signal 최대 3개",
+          "그 외는 signal 최대 5개"
+        ]
+      },
+      "entrypoints": [
+        {
+          "step": "뉴스 수집 및 LLM 분석",
+          "script": "/workspace/scripts/news/analyze_sources.py",
+          "command": "python scripts/news/analyze_sources.py --region 마포구",
+          "options": [
+            {
+              "name": "--region",
+              "default": "required",
+              "description": "분석 대상 지역명"
+            },
+            {
+              "name": "--max-items",
+              "default": null,
+              "description": "네이버 목록에서 수집할 최대 뉴스 수"
+            },
+            {
+              "name": "--model",
+              "default": "OPENAI_MODEL_PLANNER",
+              "description": "본문 분석 모델"
+            },
+            {
+              "name": "--filter-model",
+              "default": "--model",
+              "description": "제목 필터링 모델"
+            },
+            {
+              "name": "--analyze-limit",
+              "default": null,
+              "description": "본문 분석할 최대 뉴스 수"
+            },
+            {
+              "name": "--max-output-tokens",
+              "default": 6000,
+              "description": "LLM 응답 최대 토큰"
+            },
+            {
+              "name": "--env-file",
+              "default": "/workspace/.env",
+              "description": "OpenAI 환경변수 파일"
+            },
+            {
+              "name": "--headless",
+              "default": true,
+              "description": "브라우저 headless 실행"
+            },
+            {
+              "name": "--print-news-only",
+              "default": false,
+              "description": "LLM 호출 없이 수집 결과만 출력"
+            }
+          ],
+          "outputFiles": [
+            "/workspace/data/news/analysis/news_llm_{region}_{YYYYMMDD}.json"
+          ]
+        },
+        {
+          "step": "뉴스 payload 생성",
+          "script": "/workspace/scripts/news/build_payload.py",
+          "command": "python scripts/news/build_payload.py data/news/analysis/news_llm_마포구_20260517.json",
+          "options": [
+            {
+              "name": "news_analysis_path",
+              "default": "required",
+              "description": "analyze_sources.py가 만든 news_llm JSON"
+            }
+          ],
+          "outputFiles": [
+            "/workspace/data/news/payloads/news_payload_{YYYYMMDD}_{index:03d}_{safe_title}.json"
+          ]
+        },
+        {
+          "step": "뉴스 글 생성",
+          "script": "/workspace/scripts/news/write_article.py",
+          "command": "python scripts/news/write_article.py data/news/payloads/news_payload_20260517_000_xxx.json",
+          "options": [
+            {
+              "name": "package_path",
+              "default": "required",
+              "description": "news_payload JSON"
+            },
+            {
+              "name": "--output-dir",
+              "default": "/workspace/data/news/articles",
+              "description": "생성 글 저장 디렉토리"
+            }
+          ],
+          "outputFiles": [
+            "/workspace/data/news/articles/news_article_{YYYYMMDD}_{safe_title}.md"
+          ]
+        }
+      ],
+      "articleTypes": [
+        {
+          "type": "학군프리미엄",
+          "scope": "dong",
+          "lookbackMonths": 12,
+          "uses": [
+            "단지 필터",
+            "peer 비교",
+            "월별 시계열",
+            "거래량"
+          ],
+          "requiredPayloadPieces": [
+            "subject_apartments",
+            "peer_apartments",
+            "area_stats"
+          ]
+        },
+        {
+          "type": "풍선효과",
+          "scope": "sigungu",
+          "lookbackMonths": 6,
+          "uses": [
+            "월별 시계열",
+            "거래량"
+          ],
+          "requiredPayloadPieces": [
+            "area_stats"
+          ]
+        },
+        {
+          "type": "수혜단지비교",
+          "scope": "dong",
+          "lookbackMonths": 6,
+          "uses": [
+            "단지 필터",
+            "peer 비교"
+          ],
+          "signalLimit": 3,
+          "requiredPayloadPieces": [
+            "subject_apartments",
+            "peer_apartments"
+          ]
+        },
+        {
+          "type": "공급충격",
+          "scope": "sigungu",
+          "lookbackMonths": 12,
+          "uses": [
+            "월별 시계열",
+            "거래량"
+          ],
+          "signalLimit": 2,
+          "requiredPayloadPieces": [
+            "area_stats",
+            "detected_signals"
+          ]
+        },
+        {
+          "type": "갭메우기",
+          "scope": "dong",
+          "lookbackMonths": 6,
+          "uses": [
+            "단지 필터",
+            "peer 비교",
+            "월별 시계열"
+          ],
+          "requiredPayloadPieces": [
+            "subject_apartments",
+            "peer_apartments",
+            "area_stats"
+          ]
+        },
+        {
+          "type": "규제충격",
+          "scope": "sigungu",
+          "lookbackMonths": 6,
+          "uses": [
+            "월별 시계열",
+            "거래량"
+          ],
+          "requiredPayloadPieces": [
+            "area_stats"
+          ]
+        }
+      ],
+      "stageArtifacts": [
+        {
+          "stage": "analysis",
+          "reads": [
+            "Naver region news page",
+            "news detail pages",
+            "news title/body/date/url"
+          ],
+          "writes": [
+            "news_llm_{region}_{YYYYMMDD}.json"
+          ],
+          "importantKeys": [
+            "region_name",
+            "collected_at",
+            "news_count",
+            "analyzed_items[].news",
+            "analyzed_items[].llm_output"
+          ]
+        },
+        {
+          "stage": "payload",
+          "reads": [
+            "news_llm JSON",
+            "rules.yaml",
+            "MOLIT apartment trades"
+          ],
+          "writes": [
+            "news_payload_{date}_{index}_{safe_title}.json"
+          ],
+          "importantKeys": [
+            "market_context",
+            "subject_apartments",
+            "peer_apartments",
+            "area_stats",
+            "detected_signals",
+            "market_observation_scope",
+            "debug_scope"
+          ]
+        },
+        {
+          "stage": "article",
+          "reads": [
+            "news_payload JSON",
+            "OPENAI settings",
+            "news article prompt"
+          ],
+          "writes": [
+            "news_article_{date}_{safe_title}.md"
+          ],
+          "importantKeys": [
+            "title",
+            "article_md",
+            "tokens_used"
+          ]
+        }
+      ],
+      "filters": [
+        "제목 필터 LLM이 relevant=true로 판단한 기사만 본문 분석합니다.",
+        "llm_output.is_real_estate_relevant=false면 payload 생성에서 스킵합니다.",
+        "apartment_price_relevance가 direct가 아니면 스킵합니다.",
+        "analysis_lens가 기타이면 현재 발행 보류로 스킵합니다.",
+        "primary_locations의 location_confidence가 low인 위치는 실거래 조회에서 제외합니다.",
+        "collection_region과 llm_output의 sigungu가 맞지 않으면 해당 위치는 스킵합니다."
+      ],
+      "payloadFields": [
+        "market_context",
+        "subject_apartments",
+        "peer_apartments",
+        "area_stats",
+        "detected_signals",
+        "focus_trade_data_status",
+        "market_observation_scope",
+        "debug_scope"
+      ],
+      "signalRules": [
+        "writer에는 raw signal 전체가 아니라 _prepare_writer_signals에서 선별된 signal만 전달합니다.",
+        "same_complex_floor_gap은 거래 4건 미만이면 본문 노출 제외합니다.",
+        "same_complex_floor_gap은 격차 40% 초과 시 면적/타입 혼합 가능성으로 제외합니다.",
+        "price_drop은 직전 거래 표본이 2건 미만이고 하락폭 20% 이상이면 low confidence caution을 붙입니다.",
+        "new_high 기본값은 lookback 12개월, fallback 24개월, 평균 대비 +3% 이상, 최근 고점 돌파 필요입니다.",
+        "price_drop 기본값은 직전 동일 조건 대비 10% 이상 하락입니다."
+      ],
+      "upgradeNotes": [
+        "analysis_lens 추가 시 ANGLE_DATA_REQUIREMENTS와 writing prompt를 함께 갱신해야 합니다.",
+        "rules.yaml의 candidate_rules는 현재 코드의 신규 룰명과 일부 불일치하므로 signal 튜닝 전 설정 파일 정리가 필요합니다.",
+        "기타 렌즈 발행을 열려면 build_payload.py의 skip 정책과 데이터 요구사항을 먼저 확정해야 합니다."
+      ]
+    },
+    {
+      "id": "bunyang",
+      "name": "분양 자동화",
+      "purpose": "청약홈 목록과 네이버 분양 상세를 수집하고, 일정 단계별 글 전략/분양가/공고문/주변 실거래/생활권 데이터를 합쳐 분양 해석글을 생성합니다.",
+      "pipelineOverview": [
+        {
+          "order": 1,
+          "name": "분양 목록 source 확보",
+          "script": "/workspace/scripts/bunyang/collect_sources.py",
+          "input": "--target-name 또는 --step1-path 또는 --region",
+          "output": "step1_applyhome_{date}.json",
+          "visual": "청약홈 목록 -> 수집 대상 단지명 리스트"
+        },
+        {
+          "order": 2,
+          "name": "네이버 분양 상세 수집",
+          "script": "/workspace/scripts/bunyang/collect_sources.py",
+          "input": "target_names",
+          "output": "step2_naver_detail_{date}.json",
+          "visual": "단지명 리스트 -> 네이버 상세/일정/타입/학교/공고문 URL"
+        },
+        {
+          "order": 3,
+          "name": "분양 payload 생성",
+          "script": "/workspace/scripts/bunyang/build_payload.py",
+          "input": "step2 detail + optional step1",
+          "output": "bunyang_payload_{date}_{project}.json",
+          "visual": "상세 데이터 + 공고문 + 주변 실거래 + 생활권 -> writer용 package"
+        },
+        {
+          "order": 4,
+          "name": "분양 글 작성",
+          "script": "/workspace/scripts/bunyang/write_article.py",
+          "input": "bunyang_payload JSON",
+          "output": "bunyang_article_{date}_{title}.md",
+          "visual": "payload + phase 전략 + prompt -> markdown article"
+        },
+        {
+          "order": 5,
+          "name": "부가 데이터 삽입/미리보기",
+          "script": "/workspace/scripts/bunyang/build_article_extras.py",
+          "input": "payload + optional article path",
+          "output": "표/그래프/공고문 이미지/본문 삽입",
+          "visual": "payload의 보조 데이터 -> article extras"
+        }
+      ],
+      "codeFlow": [
+        {
+          "script": "/workspace/scripts/bunyang/collect_sources.py",
+          "calls": [
+            "collect_applyhome_step1(region, headless)",
+            "_names_from_step1(step1_data, limit)",
+            "collect_naver_step2_from_names(target_names, headless)",
+            "save_step1_json(...)",
+            "save_step2_json(...)"
+          ],
+          "pipelineModules": [
+            "/workspace/pipeline/bunyang/collect_applyhome_list.py",
+            "/workspace/pipeline/bunyang/collect_naver_detail.py"
+          ],
+          "generated": [
+            "/workspace/data/bunyang/source_data/step1_applyhome_{YYYYMMDD}.json",
+            "/workspace/data/bunyang/source_data/step2_naver_detail_{YYYYMMDD}.json"
+          ]
+        },
+        {
+          "script": "/workspace/scripts/bunyang/build_payload.py",
+          "calls": [
+            "run_build_source_bunyang(detail_path, step1_path, item_index)",
+            "_extract_detail_result(...)",
+            "_find_matching_step1_item(...)",
+            "build_market_comparison(...)",
+            "build_bunyang_data_package(...)",
+            "parse_notice_pdf(...)",
+            "enrich_bunyang_living_area_payload(max_destinations=4)"
+          ],
+          "pipelineModules": [
+            "/workspace/pipeline/bunyang/build_payload.py",
+            "/workspace/pipeline/bunyang/parse_notice_pdf.py",
+            "/workspace/pipeline/integrations/tmap/enrich_living_area.py",
+            "/workspace/pipeline/news/collect_market_data.py"
+          ],
+          "generated": [
+            "/workspace/data/bunyang/payloads/bunyang_payload_{YYYYMMDD}_{safe_project_name}.json"
+          ]
+        },
+        {
+          "script": "/workspace/scripts/bunyang/write_article.py",
+          "calls": [
+            "OpenAISettings.from_env()",
+            "write_bunyang_article(package, client)",
+            "save_bunyang_article(result, package, output_dir)",
+            "insert_bunyang_article_extras(...)"
+          ],
+          "pipelineModules": [
+            "/workspace/pipeline/bunyang/write_article.py",
+            "/workspace/pipeline/prompts/bunyang_article_writing_prompt.py",
+            "/workspace/pipeline/bunyang/article_extras.py"
+          ],
+          "generated": [
+            "/workspace/data/bunyang/articles/bunyang_article_{YYYYMMDD}_{safe_title}.md"
+          ]
+        },
+        {
+          "script": "/workspace/scripts/bunyang/build_article_extras.py",
+          "calls": [
+            "render_bunyang_article_extras(package)",
+            "write_bunyang_article_graphs(package, graphs_dir)",
+            "build_notice_highlight_images_summary(...)",
+            "insert_bunyang_article_extras(article_md, package)"
+          ],
+          "pipelineModules": [
+            "/workspace/pipeline/bunyang/article_extras.py",
+            "/workspace/pipeline/bunyang/article_graphs.py",
+            "/workspace/pipeline/bunyang/notice_highlight_images.py"
+          ],
+          "generated": [
+            "/workspace/data/bunyang/articles/graphs/*.html",
+            "/workspace/data/bunyang/articles/notice_images/*",
+            "updated article markdown when --article-path is provided"
+          ]
+        }
+      ],
+      "branchOptions": {
+        "sourceSelection": [
+          "--target-name을 쓰면 청약홈 목록 수집 없이 지정 단지만 상세 수집",
+          "--step1-path를 쓰면 기존 목록에서 단지명 추출",
+          "둘 다 없으면 --region 기준 청약홈 목록부터 수집",
+          "--limit로 step1에서 step2로 넘길 단지 수 제한",
+          "--all-items로 step2 results 전체 payload 생성 또는 --item-index로 단일 payload 생성"
+        ],
+        "projectTypeRules": [
+          "잔여 키워드 -> APT 잔여세대",
+          "임대 키워드 -> 임대/민간임대",
+          "오피스텔 키워드 -> 오피스텔",
+          "도시형 키워드 -> 도시형생활주택",
+          "생활숙박 키워드 -> 생활숙박시설",
+          "그 외 -> APT 분양"
+        ],
+        "marketComparisonFallbacks": [
+          "분양주소에서 시군구/동 추출",
+          "같은 동 실거래를 먼저 조회",
+          "같은 동 데이터가 없으면 같은 구 조회",
+          "최근 12개월, unit_options 면적 그룹 기준",
+          "비교 단지는 거래량 상위 max_peers 기본 6개",
+          "실거래 없으면 comparison_scope.status=unavailable과 writer_note 생성"
+        ],
+        "enrichmentDefaults": [
+          "공고문 URL이 있으면 parse_notice_pdf로 notice_document 생성",
+          "생활권 보강은 enrich_bunyang_living_area_payload(max_destinations=4)",
+          "분양가 summary range와 타입별 가격이 다르면 타입별 분양가 우선"
+        ]
+      },
+      "entrypoints": [
+        {
+          "step": "분양 source 수집",
+          "script": "/workspace/scripts/bunyang/collect_sources.py",
+          "command": "python scripts/bunyang/collect_sources.py --region 서울 --limit 3",
+          "options": [
+            {
+              "name": "--target-name",
+              "default": null,
+              "description": "수집할 단지명을 직접 지정. 여러 번 사용 가능"
+            },
+            {
+              "name": "--step1-path",
+              "default": null,
+              "description": "이미 수집된 청약홈 step1 JSON"
+            },
+            {
+              "name": "--region",
+              "default": "서울",
+              "description": "청약홈 목록 수집 지역"
+            },
+            {
+              "name": "--limit",
+              "default": null,
+              "description": "step1 목록에서 네이버 상세로 넘길 최대 단지 수"
+            },
+            {
+              "name": "--headful",
+              "default": false,
+              "description": "브라우저 화면 표시"
+            }
+          ],
+          "outputFiles": [
+            "/workspace/data/bunyang/source_data/step1_applyhome_{YYYYMMDD}.json",
+            "/workspace/data/bunyang/source_data/step2_naver_detail_{YYYYMMDD}.json"
+          ]
+        },
+        {
+          "step": "분양 payload 생성",
+          "script": "/workspace/scripts/bunyang/build_payload.py",
+          "command": "python scripts/bunyang/build_payload.py data/bunyang/source_data/step2_naver_detail_20260517.json --step1-path data/bunyang/source_data/step1_applyhome_20260517.json --all-items",
+          "options": [
+            {
+              "name": "detail_path",
+              "default": "required",
+              "description": "네이버 분양 상세 step2 JSON"
+            },
+            {
+              "name": "--step1-path",
+              "default": null,
+              "description": "청약홈 목록/경쟁률 보강용 step1 JSON"
+            },
+            {
+              "name": "--item-index",
+              "default": 0,
+              "description": "step2 results 중 단일 항목 인덱스"
+            },
+            {
+              "name": "--all-items",
+              "default": false,
+              "description": "step2 results 전체를 payload로 생성"
+            }
+          ],
+          "outputFiles": [
+            "/workspace/data/bunyang/payloads/bunyang_payload_{YYYYMMDD}_{safe_project_name}.json"
+          ]
+        },
+        {
+          "step": "분양 글 생성",
+          "script": "/workspace/scripts/bunyang/write_article.py",
+          "command": "python scripts/bunyang/write_article.py data/bunyang/payloads/bunyang_payload_20260517_xxx.json",
+          "options": [
+            {
+              "name": "package_paths",
+              "default": "required",
+              "description": "하나 이상 bunyang_payload JSON"
+            },
+            {
+              "name": "--output-dir",
+              "default": "/workspace/data/bunyang/articles",
+              "description": "생성 글 저장 디렉토리"
+            }
+          ],
+          "outputFiles": [
+            "/workspace/data/bunyang/articles/bunyang_article_{YYYYMMDD}_{safe_title}.md"
+          ]
+        },
+        {
+          "step": "분양 부가 데이터 삽입",
+          "script": "/workspace/scripts/bunyang/build_article_extras.py",
+          "command": "python scripts/bunyang/build_article_extras.py data/bunyang/payloads/bunyang_payload_20260517_xxx.json --article-path data/bunyang/articles/bunyang_article_20260517_xxx.md",
+          "options": [
+            {
+              "name": "payload_path",
+              "default": "required",
+              "description": "bunyang_payload JSON"
+            },
+            {
+              "name": "--article-path",
+              "default": null,
+              "description": "표/이미지/지도 마커를 삽입할 글 MD"
+            },
+            {
+              "name": "--graphs-dir",
+              "default": "/workspace/data/bunyang/articles/graphs",
+              "description": "분양 그래프 HTML 저장 위치"
+            },
+            {
+              "name": "--notice-images-dir",
+              "default": "/workspace/data/bunyang/articles/notice_images",
+              "description": "공고문 발췌 이미지 저장 위치"
+            }
+          ],
+          "outputFiles": [
+            "/workspace/data/bunyang/articles/graphs/*.html",
+            "/workspace/data/bunyang/articles/notice_images/*"
+          ]
+        }
+      ],
+      "articlePhases": [
+        {
+          "phase": "접수 전",
+          "condition": "작성일 < 접수 시작",
+          "readerIntent": "청약을 넣을지 말지 판단",
+          "requiredFields": [
+            "접수 일정",
+            "분양가",
+            "타입별 정보",
+            "청약 자격/통장",
+            "입지/학교"
+          ],
+          "createdBy": "_build_article_phase"
+        },
+        {
+          "phase": "접수 중",
+          "condition": "접수 시작 <= 작성일 <= 접수 마감",
+          "readerIntent": "마감 전 최종 체크",
+          "requiredFields": [
+            "접수 시작/마감",
+            "공급 유형",
+            "타입별 세대수",
+            "분양가",
+            "계약 일정"
+          ],
+          "createdBy": "_build_article_phase"
+        },
+        {
+          "phase": "접수 마감 후 발표 전",
+          "condition": "접수 마감 < 작성일 < 발표일",
+          "readerIntent": "당첨 시 계약할 수 있는지 미리 계산",
+          "requiredFields": [
+            "발표일",
+            "계약 일정",
+            "계약금",
+            "중도금 1차",
+            "전매제한",
+            "대출 조건"
+          ],
+          "createdBy": "_build_article_phase"
+        },
+        {
+          "phase": "발표 후 계약 전",
+          "condition": "발표일 <= 작성일 < 계약 시작",
+          "readerIntent": "당첨 후 계약할지, 포기할지 판단",
+          "requiredFields": [
+            "발표일",
+            "계약 일정",
+            "계약금",
+            "중도금 일정",
+            "전매제한"
+          ],
+          "createdBy": "_build_article_phase"
+        },
+        {
+          "phase": "계약 후",
+          "condition": "작성일 > 계약 마감",
+          "readerIntent": "입주까지 자금 관리",
+          "requiredFields": [
+            "중도금 일정",
+            "잔금",
+            "입주 예정월",
+            "전매제한",
+            "대출 조건"
+          ],
+          "createdBy": "_build_article_phase"
+        },
+        {
+          "phase": "입주 전",
+          "condition": "계약 마감 후이고 입주 예정월 120일 전부터",
+          "readerIntent": "잔금·등기·전입·하자점검 준비",
+          "requiredFields": [
+            "입주 예정월",
+            "잔금",
+            "취득세",
+            "등기/전입 안내",
+            "하자점검/입주 지정기간"
+          ],
+          "createdBy": "_build_article_phase"
+        }
+      ],
+      "stageArtifacts": [
+        {
+          "stage": "source",
+          "reads": [
+            "청약홈 분양 목록",
+            "네이버 분양 상세 페이지"
+          ],
+          "writes": [
+            "step1_applyhome_{date}.json",
+            "step2_naver_detail_{date}.json"
+          ],
+          "importantKeys": [
+            "source_items",
+            "results[].summary",
+            "results[].basic_info",
+            "results[].sale_schedule",
+            "results[].scale_info",
+            "results[].school_info"
+          ]
+        },
+        {
+          "stage": "payload",
+          "reads": [
+            "step2 detail JSON",
+            "optional step1 JSON",
+            "MOLIT trades",
+            "notice PDF",
+            "TMAP route API"
+          ],
+          "writes": [
+            "bunyang_payload_{date}_{safe_project_name}.json"
+          ],
+          "importantKeys": [
+            "article_brief",
+            "facts_to_use",
+            "article_phase",
+            "price_guidance",
+            "market_comparison",
+            "notice_document",
+            "unit_options",
+            "living_area_walk_info"
+          ]
+        },
+        {
+          "stage": "article",
+          "reads": [
+            "bunyang_payload JSON",
+            "bunyang prompt",
+            "article extras renderer"
+          ],
+          "writes": [
+            "bunyang_article_{date}_{safe_title}.md"
+          ],
+          "importantKeys": [
+            "title",
+            "article_md",
+            "tokens_used"
+          ]
+        },
+        {
+          "stage": "extras",
+          "reads": [
+            "bunyang_payload JSON",
+            "optional article markdown"
+          ],
+          "writes": [
+            "graphs HTML",
+            "notice highlight images",
+            "article markdown with inserted extras"
+          ],
+          "importantKeys": [
+            "rendered markdown tables",
+            "graph paths",
+            "notice image summary"
+          ]
+        }
+      ],
+      "dataRules": [
+        "project_type은 source category/division/house_type, summary 카테고리, basic_info 주택형 텍스트로 판정합니다.",
+        "타입별 payment_schedule은 계약금/중도금/잔금/납부/차수 관련 행만 남기고 기본정보 라벨 행은 제거합니다.",
+        "분양가 범위와 타입별 최저/최고가가 다르면 본문 기준은 타입별 분양가 우선입니다.",
+        "주변 실거래 비교는 주소에서 시군구/동을 뽑고, 같은 동 수집을 먼저 시도한 뒤 없으면 같은 구로 fallback합니다.",
+        "주변 비교 단지는 거래량 상위 max_peers 기본 6개입니다.",
+        "생활권 도보 정보는 TMAP 보강 max_destinations 기본 4개입니다.",
+        "모집공고문 URL이 있으면 PDF를 파싱해 notice_document를 만들고, 없으면 공고문 재확인 caveat를 붙입니다."
+      ],
+      "payloadFields": [
+        "package_type",
+        "created_at",
+        "article_brief",
+        "facts_to_use",
+        "article_phase",
+        "project_overview",
+        "price_guidance",
+        "market_comparison",
+        "notice_document",
+        "subscription_schedule",
+        "unit_options",
+        "school_information",
+        "application_results",
+        "reader_checkpoints",
+        "collection_quality",
+        "living_area_walk_info"
+      ],
+      "upgradeNotes": [
+        "새 분양 타입을 추가하면 _derive_project_type과 분양 writing prompt의 섹션 전략을 함께 갱신해야 합니다.",
+        "단계별 글 전략은 ARTICLE_PHASE_GUIDES에 있으므로 문체/필수 필드 변경 시 이 파일과 동기화해야 합니다.",
+        "주변 실거래 비교의 lookback_months, max_peers는 build_market_comparison 인자에서 조정합니다.",
+        "생활권 목적지 개수는 enrich_bunyang_living_area_payload(max_destinations=4)에서 조정합니다."
+      ]
+    }
+  ]
+}

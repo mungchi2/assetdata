@@ -19,7 +19,6 @@ export function markdownToHtml(md: string): string {
         continue;
       }
       const tag = inBody ? "td" : "th";
-      const wrapper = inBody ? "tr" : (html.includes("<thead>") ? "tr" : "tr");
       if (!inBody && !html.includes("<thead>")) html += "<thead>";
       html += `<tr>${cells(row).map((c) => `<${tag}>${c}</${tag}>`).join("")}</tr>`;
     }
@@ -30,6 +29,8 @@ export function markdownToHtml(md: string): string {
   });
 
   let html = md
+    // images
+    .replace(/!\[([^\]]*)]\(([^)\s]+)(?:\s+"[^"]*")?\)/g, '<img src="$2" alt="$1">')
     // headings
     .replace(/^### (.+)$/gm, "<h3>$1</h3>")
     .replace(/^## (.+)$/gm, "<h2>$1</h2>")
@@ -50,7 +51,7 @@ export function markdownToHtml(md: string): string {
     .replace(/^> (.+)$/gm, "<blockquote>$1</blockquote>");
 
   // paragraphs: blank-line-separated blocks not already wrapped in a block tag
-  const blockTags = /^<(h[1-6]|ul|ol|li|blockquote|hr|pre|table)/;
+  const blockTags = /^<(h[1-6]|ul|ol|li|blockquote|hr|pre|table|img)/;
   html = html
     .split(/\n{2,}/)
     .map((block) => {

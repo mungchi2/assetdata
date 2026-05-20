@@ -4,6 +4,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "주식보는 시선 — 준비중 | AssetData",
   description: "실적, 밸류에이션, 수급 데이터를 함께 보는 주식 분석 콘텐츠를 준비하고 있습니다.",
+  robots: { index: false, follow: false },
 };
 
 export default function StockPage() {
