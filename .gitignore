@@ -23,6 +23,9 @@
 # misc
 .DS_Store
 *.pem
+.agentctl-runtime/
+.claude/
+.codex/
 
 # debug
 npm-debug.log*
