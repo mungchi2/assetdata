@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { getAllArticles } from "@/lib/articles";
+import { getAllArticles, getArticlesByCategorySlug } from "@/lib/articles";
 import { categories } from "@/lib/categories";
 import { siteConfig } from "@/lib/site";
 
@@ -16,12 +16,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${apt}/sources`,      lastModified: new Date(), changeFrequency: "monthly", priority: 0.4 },
   ];
 
-  const categoryPages: MetadataRoute.Sitemap = categories.map((cat) => ({
-    url: `${apt}/category/${cat.slug}`,
-    lastModified: new Date(),
-    changeFrequency: "weekly",
-    priority: 0.7,
-  }));
+  // 글이 0편인 카테고리는 sitemap에서 제외한다(빈 색인 페이지 방지).
+  const categoryPages: MetadataRoute.Sitemap = categories
+    .filter((cat) => getArticlesByCategorySlug(cat.slug).length > 0)
+    .map((cat) => ({
+      url: `${apt}/category/${cat.slug}`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.7,
+    }));
 
   const articlePages: MetadataRoute.Sitemap = getAllArticles().map((article) => ({
     url: `${apt}/article/${article.slug}`,

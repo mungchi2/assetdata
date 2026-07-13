@@ -316,6 +316,31 @@ img { max-width: 100%; height: auto; display: block; }
   }
 }
 
+/* 그리드 자식의 기본 min-width:auto가 긴 콘텐츠(URL·표)에 밀려
+   부모 폭을 넘기는 것을 막는다(모바일 가로 넘침 방지). */
+.article-grid > * {
+  min-width: 0;
+}
+
+/* 상단 메타 compact byline */
+.article-byline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin: 0 0 1.8em;
+  padding: 10px 14px;
+  background: var(--bg-muted);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+.article-byline span {
+  white-space: nowrap;
+}
+
 .article-header {
   margin-bottom: 32px;
   padding-bottom: 28px;
@@ -413,6 +438,13 @@ img { max-width: 100%; height: auto; display: block; }
 
 .prose em { font-style: italic; }
 
+/* 본문 링크(자동 링크된 출처 URL 포함): 긴 URL이 컨테이너를 넘지 않게 */
+.prose a {
+  color: var(--accent);
+  text-decoration: underline;
+  overflow-wrap: anywhere;
+}
+
 .prose blockquote {
   margin: 1.6em 0;
   padding: 1em 1.2em;
@@ -443,8 +475,10 @@ img { max-width: 100%; height: auto; display: block; }
 
 .prose img {
   width: 100%;
+  max-width: 560px;
   height: auto;
-  margin: 1.8em 0;
+  display: block;
+  margin: 1.8em auto;
   border: 1px solid var(--border);
   border-radius: 8px;
 }

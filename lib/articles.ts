@@ -3,6 +3,23 @@ import path from "path";
 
 const articlesDir = path.join(process.cwd(), "content/articles");
 
+// 라우터가 넘기는 percent-encoded 한글 slug를 안전하게 디코딩한다.
+// 잘못된 escape가 들어오면 원본 slug를 그대로 사용한다.
+export function safeDecodeSlug(slug: string): string {
+  try {
+    return decodeURIComponent(slug);
+  } catch {
+    return slug;
+  }
+}
+
+// 본문에서 첫 번째 이미지 URL을 추출한다(없으면 null). og:image 용도.
+export function getFirstImageUrl(body: string): string | null {
+  const match = body.match(/!\[[^\]]*]\((<[^>]+>|[^)\s]+)/);
+  if (!match) return null;
+  return match[1].replace(/^<|>$/g, "");
+}
+
 export type Article = {
   slug: string;
   title: string;
@@ -58,7 +75,7 @@ export function getAllArticles(): Article[] {
 }
 
 export function getArticleBySlug(slug: string): ArticleWithBody | null {
-  return readArticleFile(path.join(articlesDir, `${slug}.md`));
+  return readArticleFile(path.join(articlesDir, `${safeDecodeSlug(slug)}.md`));
 }
 
 export function getArticlesByCategorySlug(categorySlug: string): Article[] {

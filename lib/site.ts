@@ -6,7 +6,7 @@ export const siteConfig = {
   url: "https://assetdata.kr/apt",
   contactEmail: "apora112@naver.com",
   author: {
-    name: "김땅땅",
+    name: "집보는 시선",
     url: "https://assetdata.kr/apt/about",
   },
 };

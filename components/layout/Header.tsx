@@ -1,8 +1,13 @@
 import Link from "next/link";
 import { categories } from "@/lib/categories";
+import { getArticlesByCategorySlug } from "@/lib/articles";
 import { siteConfig } from "@/lib/site";
 
 export default function Header() {
+  // 글이 0편인 카테고리는 내비게이션에 노출하지 않는다.
+  const visibleCategories = categories.filter(
+    (category) => getArticlesByCategorySlug(category.slug).length > 0,
+  );
   return (
     <header className="site-header">
       <div className="site-header__inner">
@@ -19,7 +24,7 @@ export default function Header() {
 
       <div className="site-header__cats">
         <div className="site-header__cats-inner">
-          {categories.map((category) => (
+          {visibleCategories.map((category) => (
             <Link
               key={category.slug}
               href={`/apt/category/${category.slug}`}

@@ -12,10 +12,13 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
   const { slug } = await params;
   const category = getCategoryBySlug(slug);
   if (!category) return {};
+  // 글이 0편인 카테고리는 색인 대상에서 제외한다(빈 페이지 노출 방지).
+  const isEmpty = getArticlesByCategorySlug(category.slug).length === 0;
   return {
     title: category.name,
     description: category.description,
     openGraph: { title: category.name, description: category.description, locale: "ko_KR" },
+    ...(isEmpty ? { robots: { index: false, follow: false } } : {}),
   };
 }
 
