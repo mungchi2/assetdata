@@ -27,6 +27,12 @@ export type Article = {
   categorySlug: string;
   district: string;
   publishedAt: string;
+  // 신뢰 메타(원본에 있을 때만 채워짐)
+  description?: string;
+  author?: string;
+  dataReviewedBy?: string;
+  updatedAt?: string;
+  dataAsOf?: string;
 };
 
 export type ArticleWithBody = Article & { body: string };
@@ -57,6 +63,11 @@ function readArticleFile(filePath: string): ArticleWithBody | null {
       categorySlug: data.categorySlug ?? "",
       district: data.district ?? "",
       publishedAt: data.publishedAt ?? "",
+      description: data.description || undefined,
+      author: data.author || undefined,
+      dataReviewedBy: data.dataReviewedBy || undefined,
+      updatedAt: data.updatedAt || undefined,
+      dataAsOf: data.dataAsOf || undefined,
       body,
     };
   } catch {

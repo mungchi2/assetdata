@@ -21,18 +21,20 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
   const canonicalSlug = safeDecodeSlug(slug);
   const url = `${siteConfig.url}/article/${canonicalSlug}`;
   const image = getFirstImageUrl(article.body);
+  const description = article.description ?? article.summary;
   return {
     title: article.title,
-    description: article.summary,
+    description,
     alternates: { canonical: `/apt/article/${canonicalSlug}` },
     openGraph: {
       type: "article",
       title: article.title,
-      description: article.summary,
+      description,
       url,
       siteName: siteConfig.name,
       locale: "ko_KR",
       publishedTime: article.publishedAt,
+      ...(article.updatedAt ? { modifiedTime: article.updatedAt } : {}),
       ...(image ? { images: [image] } : {}),
     },
     ...(image
@@ -40,7 +42,7 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
           twitter: {
             card: "summary_large_image",
             title: article.title,
-            description: article.summary,
+            description,
             images: [image],
           },
         }
@@ -71,6 +73,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
     mainEntityOfPage: { "@type": "WebPage", "@id": articleUrl },
     ...(image ? { image } : {}),
     datePublished: article.publishedAt,
+    ...(article.updatedAt ? { dateModified: article.updatedAt } : {}),
     inLanguage: "ko-KR",
     author: {
       "@type": "Person",
