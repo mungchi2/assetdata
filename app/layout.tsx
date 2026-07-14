@@ -10,6 +10,8 @@ export const metadata: Metadata = {
   },
   description: "부동산·주식 데이터를 직접 해석하는 자산 분석 블로그",
   robots: { index: true, follow: true },
+  // Google AdSense 사이트 소유 확인용 메타 태그(<meta name="google-adsense-account">).
+  other: { "google-adsense-account": "ca-pub-9894606766082055" },
 };
 
 export default function RootLayout({
