@@ -312,7 +312,8 @@ img { max-width: 100%; height: auto; display: block; }
 
 @media (min-width: 1024px) {
   .article-grid {
-    grid-template-columns: 1fr 280px;
+    /* 본문을 헤더와 같은 전체 폭으로. 우측 광고 사이드바 칸 제거(B안). */
+    grid-template-columns: 1fr;
   }
 }
 
@@ -726,11 +727,9 @@ img { max-width: 100%; height: auto; display: block; }
 
 /* Sidebar sticky ad */
 .ad-sidebar {
-  position: sticky;
-  top: calc(var(--header-h) + 44px + 20px);
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+  /* 본문 전체 폭 정렬(B안)로 우측 사이드바 광고칸 비활성화.
+     인아티클 가로 광고(ad-zone--leaderboard / --bottom)는 유지된다. */
+  display: none;
 }
 
 /* ─── Related Articles ──────────────────────────────────────── */
