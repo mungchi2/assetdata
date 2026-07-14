@@ -366,6 +366,7 @@ img { max-width: 100%; height: auto; display: block; }
   line-height: 1.4;
   margin-bottom: 16px;
   word-break: keep-all;
+  overflow-wrap: anywhere;
 }
 
 @media (min-width: 640px) {
@@ -376,6 +377,7 @@ img { max-width: 100%; height: auto; display: block; }
   font-size: 17px;
   color: var(--text-muted);
   line-height: 1.75;
+  overflow-wrap: anywhere;
   padding: 14px 18px;
   background: var(--bg-muted);
   border-left: 3px solid var(--accent);
@@ -388,7 +390,9 @@ img { max-width: 100%; height: auto; display: block; }
   line-height: 1.95;
   color: #222;
   word-break: keep-all;
-  overflow-wrap: break-word;
+  /* keep-all(공백 기준 줄바꿈)을 유지하되, 공백 없는 긴 토큰
+     (예: 긴 단지명·URL)은 넘칠 때 강제 분리해 가로 오버플로를 막는다. */
+  overflow-wrap: anywhere;
 }
 
 .prose h1 {

@@ -1,9 +1,13 @@
 import Link from "next/link";
 import { categories } from "@/lib/categories";
-import { articles } from "@/lib/articles";
+import { articles, getArticlesByCategorySlug } from "@/lib/articles";
 import { siteConfig } from "@/lib/site";
 
 export default function AptHomePage() {
+  // 글이 0편인 카테고리는 홈 카드에서 제외한다(빈 페이지로 이동 방지).
+  const visibleCategories = categories.filter(
+    (category) => getArticlesByCategorySlug(category.slug).length > 0,
+  );
   return (
     <div className="container">
       <section className="hero">
@@ -15,7 +19,7 @@ export default function AptHomePage() {
       <section style={{ marginBottom: "52px" }}>
         <h2 className="section-title">주제별 분석</h2>
         <div className="cat-grid">
-          {categories.map((category) => (
+          {visibleCategories.map((category) => (
             <Link
               key={category.slug}
               href={`/apt/category/${category.slug}`}
