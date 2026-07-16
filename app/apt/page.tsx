@@ -1,7 +1,12 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { categories } from "@/lib/categories";
 import { articles, getArticlesByCategorySlug } from "@/lib/articles";
 import { siteConfig } from "@/lib/site";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/apt" },
+};
 
 export default function AptHomePage() {
   // 글이 0편인 카테고리는 홈 카드에서 제외한다(빈 페이지로 이동 방지).
@@ -9,7 +14,7 @@ export default function AptHomePage() {
     (category) => getArticlesByCategorySlug(category.slug).length > 0,
   );
   return (
-    <div className="container">
+    <main className="container">
       <section className="hero">
         <p className="hero__label">데이터 기반 부동산 분석 블로그</p>
         <h1>{siteConfig.name}</h1>
@@ -52,6 +57,6 @@ export default function AptHomePage() {
           ))}
         </div>
       </section>
-    </div>
+    </main>
   );
 }

@@ -3,11 +3,12 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "데이터 출처",
   description: "실거래가, 건축물 정보, 입지 데이터 등 이 블로그에서 사용하는 데이터 출처와 해석 기준을 안내합니다.",
+  alternates: { canonical: "/apt/sources" },
 };
 
 export default function SourcesPage() {
   return (
-    <div className="page-outer">
+    <main className="page-outer">
       <p className="page-label">데이터 출처</p>
       <h1 className="page-title">데이터 출처 및 해석 기준</h1>
 
@@ -50,6 +51,6 @@ export default function SourcesPage() {
           확인 후 최대한 빠르게 수정하겠습니다.
         </p>
       </div>
-    </div>
+    </main>
   );
 }

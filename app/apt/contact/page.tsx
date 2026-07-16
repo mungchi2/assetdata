@@ -5,11 +5,12 @@ import RevealEmail from "@/components/layout/RevealEmail";
 export const metadata: Metadata = {
   title: "문의",
   description: "글 내용 오류 정정, 데이터 문의, 제휴 제안은 이메일로 보내주세요.",
+  alternates: { canonical: "/apt/contact" },
 };
 
 export default function ContactPage() {
   return (
-    <div className="page-outer">
+    <main className="page-outer">
       <p className="page-label">문의</p>
       <h1 className="page-title">문의 및 정정 요청</h1>
 
@@ -49,6 +50,6 @@ export default function ContactPage() {
           전문적 조언이 아닙니다. 실제 투자·매매 결정은 관련 전문가와 상담 후 신중하게 진행하시기 바랍니다.
         </p>
       </div>
-    </div>
+    </main>
   );
 }

@@ -17,6 +17,7 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
   return {
     title: category.name,
     description: category.description,
+    alternates: { canonical: `/apt/category/${slug}` },
     openGraph: { title: category.name, description: category.description, locale: "ko_KR" },
     ...(isEmpty ? { robots: { index: false, follow: false } } : {}),
   };
@@ -30,7 +31,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   const categoryArticles = getArticlesByCategorySlug(category.slug);
 
   return (
-    <div className="container" style={{ padding: "40px 20px 72px" }}>
+    <main className="container" style={{ padding: "40px 20px 72px" }}>
       <p className="page-label">카테고리</p>
       <h1 style={{ fontSize: "30px", marginBottom: "10px", wordBreak: "keep-all" }}>
         {category.name}
@@ -58,6 +59,6 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
           ))}
         </div>
       )}
-    </div>
+    </main>
   );
 }

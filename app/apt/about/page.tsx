@@ -4,11 +4,12 @@ import { siteConfig } from "@/lib/site";
 export const metadata: Metadata = {
   title: "소개",
   description: `${siteConfig.name}은 아파트 실거래가·건축물 정보·입지 데이터를 함께 분석해 부동산 가격 차이의 이유를 쉽게 설명하는 부동산 분석 블로그입니다.`,
+  alternates: { canonical: "/apt/about" },
 };
 
 export default function AboutPage() {
   return (
-    <div className="page-outer">
+    <main className="page-outer">
       <p className="page-label">소개</p>
       <h1 className="page-title">집보는 시선에 대해</h1>
 
@@ -64,6 +65,6 @@ export default function AboutPage() {
           <a href="/apt/contact">문의 페이지</a>를 이용해 주세요.
         </p>
       </div>
-    </div>
+    </main>
   );
 }

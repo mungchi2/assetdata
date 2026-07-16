@@ -5,11 +5,12 @@ import RevealEmail from "@/components/layout/RevealEmail";
 export const metadata: Metadata = {
   title: "개인정보처리방침",
   description: `${siteConfig.name}의 개인정보 수집·이용 방침 및 Google AdSense 쿠키 사용 안내입니다.`,
+  alternates: { canonical: "/apt/privacy" },
 };
 
 export default function PrivacyPage() {
   return (
-    <div className="page-outer">
+    <main className="page-outer">
       <p className="page-label">개인정보처리방침</p>
       <h1 className="page-title">개인정보처리방침</h1>
       <p style={{ fontSize: "13px", color: "var(--text-light)", marginBottom: "32px" }}>
@@ -97,6 +98,6 @@ export default function PrivacyPage() {
           {" "}으로 연락해 주세요.
         </p>
       </div>
-    </div>
+    </main>
   );
 }
