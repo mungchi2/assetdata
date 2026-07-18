@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getAllArticles } from "@/lib/articles";
+import { getAllArticles, getArticlesByCategorySlug } from "@/lib/articles";
 import { categories, getCategoryBySlug } from "@/lib/categories";
 
 export const metadata: Metadata = {
@@ -11,6 +11,10 @@ export const metadata: Metadata = {
 const latestArticles = getAllArticles().slice(0, 8);
 
 export default function RootPage() {
+  const visibleCategories = categories.filter(
+    (category) => getArticlesByCategorySlug(category.slug).length > 0,
+  );
+
   return (
     <div style={{ minHeight: "100vh", background: "#fff", fontFamily: "inherit" }}>
       <header style={{ borderBottom: "1px solid #e5e7eb", padding: "0 20px" }}>
@@ -82,7 +86,7 @@ export default function RootPage() {
         <section style={{ marginBottom: "60px" }}>
           <h2 style={{ fontSize: "26px", fontWeight: 800, color: "#111", marginBottom: "18px" }}>카테고리</h2>
           <div className="cat-grid">
-            {categories.slice(0, 6).map((category) => (
+            {visibleCategories.slice(0, 6).map((category) => (
               <Link
                 key={category.slug}
                 href={`/apt/category/${category.slug}`}
