@@ -104,8 +104,8 @@ export default function RootPage() {
           <h2 style={{ fontSize: "24px", fontWeight: 800, color: "#111", marginBottom: "14px" }}>글이 만들어지는 방식</h2>
           <p style={{ fontSize: "15px", color: "#555", lineHeight: 1.75, marginBottom: "10px" }}>
             공개 데이터 수집, 가공, 초안 작성, 사람 검수, 발행·정정의 순서로 글을 만듭니다.
-            반복 정리 작업에는 자체 데이터 파이프라인과 자동화를 활용하지만, 발행 전에는 사람이 수치와
-            사실관계를 다시 확인합니다.
+            데이터 수집·정리와 초안 작성은 자체 데이터 파이프라인을 바탕으로 진행하고, 발행 전에는
+            사람이 수치와 사실관계를 다시 확인합니다.
           </p>
           <p style={{ fontSize: "15px", color: "#555", lineHeight: 1.75, margin: 0 }}>
             운영 방식과 정정 원칙은 <Link href="/apt/about">소개 페이지</Link>에서 자세히 안내합니다.
