@@ -6,6 +6,7 @@ import { categories, getCategoryBySlug } from "@/lib/categories";
 export const metadata: Metadata = {
   title: "AssetData — 자산 데이터 분석 블로그",
   description: "AssetData는 자산 데이터 분석 블로그이며, 부동산 분석은 집보는 시선 이름으로 발행합니다.",
+  alternates: { canonical: "/" },
 };
 
 const latestArticles = getAllArticles().slice(0, 8);
