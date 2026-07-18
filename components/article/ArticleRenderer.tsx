@@ -20,6 +20,22 @@ export default function ArticleRenderer({
   backLabel = "홈으로 돌아가기",
 }: ArticleRendererProps) {
   const bodyHtml = markdownToHtml(article.body);
+  const changelogItems = article.changelog
+    ? article.changelog
+        .split("|")
+        .map((item) => item.trim())
+        .filter(Boolean)
+        .map((item) => {
+          const firstSpaceIndex = item.indexOf(" ");
+          if (firstSpaceIndex === -1) {
+            return { date: item, detail: "" };
+          }
+          return {
+            date: item.slice(0, firstSpaceIndex).trim(),
+            detail: item.slice(firstSpaceIndex + 1).trim(),
+          };
+        })
+    : [];
 
   return (
     <div className="article-outer">
@@ -50,6 +66,20 @@ export default function ArticleRenderer({
           </div>
 
           <article className="prose" dangerouslySetInnerHTML={{ __html: bodyHtml }} />
+
+          {changelogItems.length > 0 && (
+            <section style={{ marginTop: "32px" }}>
+              <h2 style={{ fontSize: "22px", marginBottom: "14px" }}>정정·수정 이력</h2>
+              <ul style={{ margin: 0, paddingLeft: "20px", color: "var(--text-muted)" }}>
+                {changelogItems.map((item) => (
+                  <li key={`${item.date}-${item.detail}`} style={{ marginBottom: "8px" }}>
+                    <span style={{ color: "var(--heading)", fontWeight: 600 }}>{item.date}</span>
+                    {item.detail ? ` ${item.detail}` : ""}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
 
           <div className="ad-zone ad-zone--bottom">
             {/* AdSense 디스플레이 광고 */}

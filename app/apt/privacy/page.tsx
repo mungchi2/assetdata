@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { siteConfig } from "@/lib/site";
-import RevealEmail from "@/components/layout/RevealEmail";
 
 export const metadata: Metadata = {
   title: "개인정보처리방침",
@@ -52,9 +51,9 @@ export default function PrivacyPage() {
 
         <h2>4. Google AdSense 및 제3자 광고</h2>
         <p>
-          본 사이트는 <strong>Google AdSense</strong>를 통해 광고를 게재합니다. Google을 포함한
-          제3자 광고 제공업체는 쿠키를 사용하여 방문자의 이전 방문 정보를 기반으로 광고를 제공할 수
-          있습니다. Google의 광고 쿠키 사용 방식은{" "}
+          본 사이트는 <strong>Google AdSense</strong> 승인 후 광고를 게재할 수 있습니다. 광고가
+          게재되는 경우 Google을 포함한 제3자 광고 제공업체는 쿠키를 사용하여 방문자의 이전 방문 정보를
+          기반으로 광고를 제공할 수 있습니다. Google의 광고 쿠키 사용 방식은{" "}
           <a href="https://policies.google.com/technologies/ads" target="_blank" rel="noopener noreferrer">
             Google 광고 정책
           </a>
@@ -74,8 +73,8 @@ export default function PrivacyPage() {
 
         <h2>5. 제3자 서비스</h2>
         <p>
-          본 사이트는 Google Analytics 등 방문 통계 분석 도구를 사용하거나 향후 도입할 수 있습니다.
-          이러한 서비스 제공업체는 각자의 개인정보처리방침에 따라 데이터를 처리합니다.
+          현재 별도의 방문 통계 분석 도구를 사용하지 않으며, 도입하는 경우 본 방침에 제품명과 사용 목적을
+          명시합니다.
         </p>
 
         <h2>6. 정보 보관 및 보호</h2>
@@ -94,8 +93,7 @@ export default function PrivacyPage() {
         <p>
           개인정보 처리와 관련한 문의는{" "}
           <a href="/apt/contact">문의 페이지</a> 또는{" "}
-          <RevealEmail email={siteConfig.contactEmail} />
-          {" "}으로 연락해 주세요.
+          <a href={`mailto:${siteConfig.contactEmail}`}>{siteConfig.contactEmail}</a>으로 연락해 주세요.
         </p>
       </div>
     </main>

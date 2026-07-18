@@ -32,6 +32,7 @@ export type Article = {
   author?: string;
   dataReviewedBy?: string;
   updatedAt?: string;
+  changelog?: string;
   dataAsOf?: string;
 };
 
@@ -67,6 +68,7 @@ function readArticleFile(filePath: string): ArticleWithBody | null {
       author: data.author || undefined,
       dataReviewedBy: data.dataReviewedBy || undefined,
       updatedAt: data.updatedAt || undefined,
+      changelog: data.changelog || undefined,
       dataAsOf: data.dataAsOf || undefined,
       body,
     };
