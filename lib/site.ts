@@ -11,7 +11,7 @@ export const siteConfig = {
   },
   reviewer: {
     name: "김팔달",
-    jobTitle: "부동산데이터분석가",
+    jobTitle: "콘텐츠 운영자",
     url: "https://assetdata.kr/apt/about",
   },
 };
