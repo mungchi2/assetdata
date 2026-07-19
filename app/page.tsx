@@ -25,7 +25,6 @@ export default function RootPage() {
           </span>
           <nav style={{ display: "flex", alignItems: "center", gap: "18px", flexWrap: "wrap" }}>
             <Link href="/apt" style={{ fontSize: "14px", color: "#555", textDecoration: "none" }}>부동산 분석</Link>
-            <span style={{ fontSize: "13px", color: "#888", fontWeight: 600 }}>주식 준비 중</span>
           </nav>
         </div>
       </header>
