@@ -41,6 +41,12 @@ export const categories: Category[] = [
     description:
       "실거래가, 건축물대장, 층·면적 해석 등 부동산 데이터를 처음 보는 분도 이해할 수 있게 설명합니다.",
   },
+  {
+    name: "시장 지표 심층분석",
+    slug: "market-indicators",
+    description:
+      "지가·오피스·상가 수익률 등 공식 통계를 자산군 교차와 수익률 분해로 재해석해 시장 국면을 진단합니다.",
+  },
 ];
 
 export function getCategoryBySlug(slug: string) {
