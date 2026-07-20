@@ -88,8 +88,8 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
     },
     publisher: {
       "@type": "Organization",
-      name: siteConfig.name,
-      url: siteConfig.url,
+      name: siteConfig.publisher.name,
+      url: siteConfig.publisher.url,
     },
     isPartOf: {
       "@type": "Blog",

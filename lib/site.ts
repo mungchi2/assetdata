@@ -14,4 +14,8 @@ export const siteConfig = {
     jobTitle: "콘텐츠 운영자",
     url: "https://assetdata.kr/apt/about",
   },
+  publisher: {
+    name: "AssetData",
+    url: "https://assetdata.kr",
+  },
 };

@@ -12,8 +12,8 @@ const websiteJsonLd = {
   inLanguage: "ko-KR",
   publisher: {
     "@type": "Organization",
-    name: siteConfig.name,
-    url: siteConfig.url,
+    name: siteConfig.publisher.name,
+    url: siteConfig.publisher.url,
     contactPoint: {
       "@type": "ContactPoint",
       email: siteConfig.contactEmail,

@@ -53,7 +53,8 @@ export default function PrivacyPage() {
         <p>
           본 사이트는 <strong>Google AdSense</strong> 승인 후 광고를 게재할 수 있습니다. 광고가
           게재되는 경우 Google을 포함한 제3자 광고 제공업체는 쿠키를 사용하여 방문자의 이전 방문 정보를
-          기반으로 광고를 제공할 수 있습니다. Google의 광고 쿠키 사용 방식은{" "}
+          기반으로 광고를 제공할 수 있습니다. Google을 포함한 제3자 광고 제공업체는 사용자의 본 사이트 및 다른
+          웹사이트(Google 파트너 사이트) 방문 기록을 바탕으로 맞춤형 광고를 제공할 수 있습니다. Google의 광고 쿠키 사용 방식은{" "}
           <a href="https://policies.google.com/technologies/ads" target="_blank" rel="noopener noreferrer">
             Google 광고 정책
           </a>
