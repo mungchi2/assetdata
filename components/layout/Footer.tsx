@@ -6,7 +6,7 @@ export default function Footer() {
     <footer className="site-footer">
       <div className="site-footer__inner">
         <div className="site-footer__brand">
-          <p>{siteConfig.name}</p>
+          <p>{siteConfig.brandLabel}</p>
           <p>아파트 실거래가·건축물 정보·입지 데이터를 함께 분석하는 부동산 블로그</p>
         </div>
         <nav className="site-footer__nav" aria-label="푸터 메뉴">
@@ -18,7 +18,7 @@ export default function Footer() {
       </div>
       <div className="container">
         <p className="site-footer__copy">
-          © 2026 {siteConfig.name}. All rights reserved. 본 블로그의 콘텐츠는 투자 권유가 아닌 정보 제공 목적입니다.
+          © 2026 {siteConfig.brandLabel}. All rights reserved. 본 블로그의 콘텐츠는 투자 권유가 아닌 정보 제공 목적입니다.
         </p>
       </div>
     </footer>

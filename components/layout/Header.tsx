@@ -12,7 +12,7 @@ export default function Header() {
     <header className="site-header">
       <div className="site-header__inner">
         <Link href="/apt" className="site-header__logo">
-          {siteConfig.name}
+          {siteConfig.brandLabel}
         </Link>
         <nav className="site-header__nav" aria-label="주요 메뉴">
           <Link href="/apt/about">소개</Link>

@@ -21,7 +21,7 @@ export default function RootPage() {
       <header style={{ borderBottom: "1px solid #e5e7eb", padding: "0 20px" }}>
         <div style={{ maxWidth: "960px", margin: "0 auto", height: "60px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px" }}>
           <span style={{ fontSize: "20px", fontWeight: 800, color: "#111", letterSpacing: "-0.3px" }}>
-            AssetData
+            집보는 시선 by AssetData
           </span>
           <nav style={{ display: "flex", alignItems: "center", gap: "18px", flexWrap: "wrap" }}>
             <Link href="/apt" style={{ fontSize: "14px", color: "#555", textDecoration: "none" }}>부동산 분석</Link>
@@ -86,7 +86,7 @@ export default function RootPage() {
         <section style={{ marginBottom: "60px" }}>
           <h2 style={{ fontSize: "26px", fontWeight: 800, color: "#111", marginBottom: "18px" }}>카테고리</h2>
           <div className="cat-grid">
-            {visibleCategories.slice(0, 6).map((category) => (
+            {visibleCategories.map((category) => (
               <Link
                 key={category.slug}
                 href={`/apt/category/${category.slug}`}
@@ -120,7 +120,7 @@ export default function RootPage() {
             <Link href="/apt/sources" style={{ fontSize: "14px", color: "#555", textDecoration: "none" }}>데이터 출처</Link>
           </div>
           <p style={{ fontSize: "13px", color: "#aaa", margin: 0 }}>
-            © 2026 AssetData. 본 사이트의 콘텐츠는 투자 권유가 아닌 정보 제공 목적입니다.
+            © 2026 집보는 시선 by AssetData. 본 사이트의 콘텐츠는 투자 권유가 아닌 정보 제공 목적입니다.
           </p>
         </div>
       </footer>
