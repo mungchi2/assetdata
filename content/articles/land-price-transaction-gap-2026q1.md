@@ -7,7 +7,6 @@ description: 2026년 1분기 지가변동률과 토지거래량을 교차 분석
 categorySlug: market-indicators
 district: 전국
 author: 집보는 시선
-dataReviewedBy: 김팔달 (부동산데이터분석가)
 publishedAt: 2026-07-21
 updatedAt: 2026-07-21
 dataAsOf: 2026-03-31
@@ -15,7 +14,6 @@ relatedPinned: gangnam-cross-asset-market-phase, commercial-yield-income-vs-capi
 ---
 <!-- pipeline-extras:start -->
 > 작성자: 집보는 시선
-> 데이터 검수: 김팔달 (부동산데이터분석가)
 > 최초 발행: 2026.07.21
 > 최종 업데이트: 2026.07.21
 <!-- pipeline-extras:end -->

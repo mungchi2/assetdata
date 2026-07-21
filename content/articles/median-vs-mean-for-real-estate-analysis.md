@@ -7,14 +7,12 @@ description: 평균과 중앙값은 둘 다 필요하지만 역할이 다르다.
 categorySlug: how-to-read
 district:
 author: 집보는 시선
-dataReviewedBy: 김팔달 (콘텐츠 운영자)
 publishedAt: 2026-07-19
 updatedAt: 2026-07-19
 dataAsOf:
 ---
 <!-- pipeline-extras:start -->
 > 작성자: 집보는 시선
-> 데이터 검수: 김팔달 (콘텐츠 운영자)
 > 최초 발행: 2026.07.19
 > 최종 업데이트: 2026.07.19
 <!-- pipeline-extras:end -->

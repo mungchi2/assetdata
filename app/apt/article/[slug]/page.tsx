@@ -80,12 +80,6 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
       name: siteConfig.author.name,
       url: siteConfig.author.url,
     },
-    editor: {
-      "@type": "Person",
-      name: siteConfig.reviewer.name,
-      jobTitle: siteConfig.reviewer.jobTitle,
-      url: siteConfig.reviewer.url,
-    },
     publisher: {
       "@type": "Organization",
       name: siteConfig.publisher.name,

@@ -30,7 +30,6 @@ export type Article = {
   // 신뢰 메타(원본에 있을 때만 채워짐)
   description?: string;
   author?: string;
-  dataReviewedBy?: string;
   updatedAt?: string;
   changelog?: string;
   dataAsOf?: string;
@@ -66,7 +65,6 @@ function readArticleFile(filePath: string): ArticleWithBody | null {
       publishedAt: data.publishedAt ?? "",
       description: data.description || undefined,
       author: data.author || undefined,
-      dataReviewedBy: data.dataReviewedBy || undefined,
       updatedAt: data.updatedAt || undefined,
       changelog: data.changelog || undefined,
       dataAsOf: data.dataAsOf || undefined,

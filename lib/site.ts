@@ -10,11 +10,6 @@ export const siteConfig = {
     name: "집보는 시선",
     url: "https://assetdata.kr/apt/about",
   },
-  reviewer: {
-    name: "김팔달",
-    jobTitle: "콘텐츠 운영자",
-    url: "https://assetdata.kr/apt/about",
-  },
   publisher: {
     name: "AssetData",
     url: "https://assetdata.kr",
