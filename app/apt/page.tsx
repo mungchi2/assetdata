@@ -5,6 +5,8 @@ import { articles, getArticlesByCategorySlug } from "@/lib/articles";
 import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
+  // 루트 레이아웃 template("%s | AssetData")의 이중 감쌈을 막아 브랜드 중복을 없앤다.
+  title: { absolute: siteConfig.titleBrand },
   alternates: { canonical: "/apt" },
 };
 
