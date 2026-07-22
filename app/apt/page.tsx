@@ -19,6 +19,10 @@ export default function AptHomePage() {
         <p className="hero__label">데이터 기반 부동산 분석 블로그</p>
         <h1>{siteConfig.name}</h1>
         <p className="hero__desc">{siteConfig.description}</p>
+        <p style={{ color: "#6b7280", fontSize: "0.875rem" }}>
+          AssetData가 운영하는 부동산 분석 사이트입니다. {" "}
+          <Link href="/">AssetData 포털</Link>
+        </p>
       </section>
 
       <section style={{ marginBottom: "52px" }}>

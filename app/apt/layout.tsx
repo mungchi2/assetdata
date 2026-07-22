@@ -24,16 +24,16 @@ const websiteJsonLd = {
 
 export const metadata: Metadata = {
   title: {
-    default: siteConfig.name,
-    template: `%s | ${siteConfig.name}`,
+    default: siteConfig.titleBrand,
+    template: `%s | ${siteConfig.titleBrand}`,
   },
   description: siteConfig.description,
   openGraph: {
     type: "website",
     locale: "ko_KR",
     url: siteConfig.url,
-    siteName: siteConfig.name,
-    title: siteConfig.name,
+    siteName: siteConfig.titleBrand,
+    title: siteConfig.titleBrand,
     description: siteConfig.description,
   },
 };
